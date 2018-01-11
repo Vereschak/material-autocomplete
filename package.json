@@ -1,0 +1,14 @@
+{
+  "name": "@danil.vereschak/material-autocomplete",
+  "version": "1.0.0",
+  "description": "Materialize-css styled autocomplete, examples:  [https://icefox0801.github.io/materialize-autocomplete/examples/](https://icefox0801.github.io/materialize-autocomplete/examples/)",
+  "main": "jquery.materialize-autocomplete.js",
+  "directories": {
+    "example": "examples"
+  },
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "MIT"
+}
