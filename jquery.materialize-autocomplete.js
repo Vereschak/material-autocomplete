@@ -86,6 +86,7 @@
   Autocomplete.defaults = {
     cacheable: true,
     limit: 10,
+    minLength: 2,
     manualInput: false,
     multiple: {
       enable: false,
@@ -195,6 +196,11 @@
       self.$el.on('input', function (e) {
         var $t = $(this);
         var value = $t.val();
+
+        if(self.options.minLength && value.length<self.options.minLength) {
+          self.$dropdown.hide();
+          return false;
+        }
 
         if (self.options.manualInput) {
           self.setValue({
