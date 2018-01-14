@@ -197,6 +197,12 @@
         var $t = $(this);
         var value = $t.val();
 
+        if (!value) {
+          self.setValue({
+            text: value
+          })
+        }
+
         if(self.options.minLength && value.length<self.options.minLength) {
           self.$dropdown.hide();
           return false;
