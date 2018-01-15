@@ -132,7 +132,8 @@
     },
     onSelect: noop,
     ignoreCase: true,
-    throttling: true
+    throttling: true,
+    manualValue: ''
   };
 
   Autocomplete.prototype = {
@@ -197,7 +198,7 @@
         var $t = $(this);
         var value = $t.val();
 
-        if (!value) {
+        if (!value &&  self.options.multiple.enable===false) {
           self.setValue({
             text: value
           })
