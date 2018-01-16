@@ -1,87 +1,88 @@
 (function (root, factory) {
 
-  if(typeof module === 'object' && module.exports) {
-    module.exports = factory(require('jquery'));
-  } else if(typeof define === 'function' && define.amd) {
-    define(['jquery'], factory);
+  if (typeof module === 'object' && module.exports) {
+    module.exports = factory(require('jquery'))
+  } else if (typeof define === 'function' && define.amd) {
+    define(['jquery'], factory)
   } else {
-    factory(root.jQuery);
+    factory(root.jQuery)
   }
 
 }(this, function ($) {
 
-  var noop = function () {};
+  var noop = function () {}
 
   var template = function (text) {
-    var matcher = new RegExp('<%=([\\s\\S]+?)%>|<%([\\s\\S]+?)%>|$', 'g');
+    var matcher = new RegExp('<%=([\\s\\S]+?)%>|<%([\\s\\S]+?)%>|$', 'g')
 
     var escapes = {
-      "'": "'",
+      '\'': '\'',
       '\\': '\\',
       '\r': 'r',
       '\n': 'n',
       '\u2028': 'u2028',
       '\u2029': 'u2029'
-    };
-
-    var escapeRegExp = /\\|'|\r|\n|\u2028|\u2029/g;
-
-    var escapeChar = function(match) {
-      return '\\' + escapes[match];
-    };
-
-    var index = 0;
-    var source = "__p+='";
-
-    text.replace(matcher, function(match, interpolate, evaluate, offset) {
-      source += text.slice(index, offset).replace(escapeRegExp, escapeChar);
-      index = offset + match.length;
-
-      if (interpolate) {
-        source += "'+\n((__t=(" + interpolate + "))==null?'':__t)+\n'";
-      } else if (evaluate) {
-        source += "';\n" + evaluate + "\n__p+='";
-      }
-
-      return match;
-    });
-
-    source += "';\n";
-    source = 'with(obj||{}){\n' + source + '}\n';
-    source = "var __t,__p='',__j=Array.prototype.join," +
-      "print=function(){__p+=__j.call(arguments,'');};\n" +
-      source + 'return __p;\n';
-
-    var render;
-
-    try {
-      render = new Function('obj', source);
-    } catch (e) {
-      e.source = source;
-      throw e;
     }
 
-    var _template = function(data) {
-      return render.call(this, data);
-    };
+    var escapeRegExp = /\\|'|\r|\n|\u2028|\u2029/g
 
-    _template.source = 'function(obj){\n' + source + '}';
+    var escapeChar = function (match) {
+      return '\\' + escapes[match]
+    }
 
-    return _template;
-  };
+    var index = 0
+    var source = '__p+=\''
+
+    text.replace(matcher, function (match, interpolate, evaluate, offset) {
+      source += text.slice(index, offset).replace(escapeRegExp, escapeChar)
+      index = offset + match.length
+
+      if (interpolate) {
+        source += '\'+\n((__t=(' + interpolate + '))==null?\'\':__t)+\n\''
+      } else if (evaluate) {
+        source += '\';\n' + evaluate + '\n__p+=\''
+      }
+
+      return match
+    })
+
+    source += '\';\n'
+    source = 'with(obj||{}){\n' + source + '}\n'
+    source = 'var __t,__p=\'\',__j=Array.prototype.join,' +
+      'print=function(){__p+=__j.call(arguments,\'\');};\n' +
+      source + 'return __p;\n'
+
+    var render
+
+    try {
+      render = new Function('obj', source)
+    } catch (e) {
+      e.source = source
+      throw e
+    }
+
+    var _template = function (data) {
+      return render.call(this, data)
+    }
+
+    _template.source = 'function(obj){\n' + source + '}'
+
+    return _template
+  }
 
   var Autocomplete = function (el, options) {
-    this.options = $.extend(true, {}, Autocomplete.defaults, options);
-    this.$el = $(el);
-    this.$wrapper = this.$el.parent();
-    this.compiled = {};
-    this.$dropdown = null;
-    this.$appender = null;
-    this.$hidden = null;
-    this.resultCache = {};
-    this.value = '';
-    this.initialize();
-  };
+    this.options = $.extend(true, {}, Autocomplete.defaults, options)
+    this.$el = $(el)
+    this.$wrapper = this.$el.parent()
+    this.compiled = {}
+    this.list = []
+    this.$dropdown = null
+    this.$appender = null
+    this.$hidden = null
+    this.resultCache = {}
+    this.value = ''
+    this.initialize()
+  }
 
   Autocomplete.defaults = {
     cacheable: true,
@@ -92,20 +93,20 @@
       enable: false,
       maxSize: 4,
       onExist: function (item) {
-        Materialize.toast('Tag: ' + item.text +' is already added!', 2000);
+        Materialize.toast('Tag: ' + item.text + ' is already added!', 2000)
       },
       onExceed: function (maxSize, item) {
-        Materialize.toast('Can\'t add over ' + maxSize + ' tags!', 2000);
+        Materialize.toast('Can\'t add over ' + maxSize + ' tags!', 2000)
       },
       onAppend: function (item) {
-        var self = this;
-        self.$el.removeClass('active');
-        self.$el.click();
+        var self = this
+        self.$el.removeClass('active')
+        self.$el.click()
       },
       onRemove: function (item) {
-        var self = this;
-        self.$el.removeClass('active');
-        self.$el.click();
+        var self = this
+        self.$el.removeClass('active')
+        self.$el.click()
       }
     },
     hidden: {
@@ -118,7 +119,7 @@
       el: '',
       tagName: 'ul',
       className: 'ac-appender',
-      tagTemplate: '<div class="chip"  data-text="<%= item.text %>"><%= item.text %><i class="material-icons close">close</i></div>'
+      tagTemplate: '<div class="chip"  data-text="<%= item.text %>"><%= item.text %><i data-close="<%= item.text %>" class="material-icons close">close</i></div>'
     },
     dropdown: {
       el: '',
@@ -128,85 +129,85 @@
       noItem: ''
     },
     getData: function (value, callback) {
-      callback(value, []);
+      callback(value, [])
     },
     onSelect: noop,
     ignoreCase: true,
     throttling: true,
     manualValue: ''
-  };
+  }
 
   Autocomplete.prototype = {
     constructor: Autocomplete,
     initialize: function () {
-      var self = this;
-      var timer;
-      var fetching = false;
+      var self = this
+      var timer
+      var fetching = false
 
       function getItemsHtml (list) {
-        var itemsHtml = '';
+        var itemsHtml = ''
 
         if (!list.length) {
-          return self.options.dropdown.noItem;
+          return self.options.dropdown.noItem
         }
 
         list.forEach(function (item, idx) {
 
           if (idx >= self.options.limit) {
-            return false;
+            return false
           }
 
-          itemsHtml += self.compiled.item({ 'item': item});
-        });
+          itemsHtml += self.compiled.item({'item': item})
+        })
 
-        return itemsHtml;
+        return itemsHtml
       }
 
       function handleList (value, list) {
-        var itemsHtml = getItemsHtml(list);
-        var currentValue = self.$el.val();
+        var itemsHtml = getItemsHtml(list)
+        var currentValue = self.$el.val()
 
         if (self.options.ignoreCase) {
-          currentValue = currentValue.toUpperCase();
+          currentValue = currentValue.toUpperCase()
         }
 
         if (self.options.cacheable && !self.resultCache.hasOwnProperty(value)) {
-          self.resultCache[value] = list;
+          self.resultCache[value] = list
         }
 
         if (value !== currentValue) {
-          return false;
+          return false
         }
 
-        if(itemsHtml) {
-          self.$dropdown.html(itemsHtml);
-          self.$dropdown.show();
+        if (itemsHtml) {
+          self.$dropdown.html(itemsHtml)
+          self.$dropdown.show()
         } else {
-          self.$dropdown.hide();
+          self.$dropdown.hide()
         }
 
       }
 
-      self.value = self.options.multiple.enable ? [] : '';
+      self.value = self.options.multiple.enable ? [] : ''
 
-      self.compiled.tag = template(self.options.appender.tagTemplate);
-      self.compiled.item = template(self.options.dropdown.itemTemplate);
+      self.compiled.tag = template(self.options.appender.tagTemplate)
+      self.compiled.item = template(self.options.dropdown.itemTemplate)
 
-      self.render();
+      self.render()
 
       self.$el.on('input', function (e) {
-        var $t = $(this);
-        var value = $t.val();
+        var $t = $(this)
+        var value = $t.val()
 
-        if (!value &&  self.options.multiple.enable===false) {
+        if (!value && self.options.multiple.enable === false) {
           self.setValue({
             text: value
           })
         }
 
-        if(self.options.minLength && value.length<self.options.minLength) {
-          self.$dropdown.hide();
-          return false;
+        if (self.options.minLength && value.length < self.options.minLength) {
+          self.$dropdown.hide()
+          return false
         }
 
         if (self.options.manualInput) {
@@ -216,82 +217,79 @@
         }
 
         if (!value) {
-          self.$dropdown.hide();
-          return false;
+          self.$dropdown.hide()
+          return false
         }
 
-
-
         if (self.options.ignoreCase) {
-          value = value.toUpperCase();
+          value = value.toUpperCase()
         }
 
         if (self.resultCache.hasOwnProperty(value) && self.resultCache[value]) {
-          handleList(value, self.resultCache[value]);
-          return true;
+          handleList(value, self.resultCache[value])
+          return true
         }
 
         if (self.options.throttling) {
-          clearTimeout(timer);
+          clearTimeout(timer)
           timer = setTimeout(function () {
-            self.options.getData(value, handleList);
-          }, 200);
-          return true;
+            self.options.getData(value, handleList)
+          }, 200)
+          return true
         }
 
-        self.options.getData(value, handleList);
-      });
+        self.options.getData(value, handleList)
+      })
 
       self.$el.on('keydown', function (e) {
-        var $t = $(this);
-        var keyCode = e.keyCode;
-        var $items, $hover;
+        var $t = $(this)
+        var keyCode = e.keyCode
+        var $items, $hover
         // BACKSPACE KEY
         if (keyCode == '8' && !$t.val()) {
 
           if (!self.options.multiple.enable) {
-            return true;
+            return true
           }
 
           if (!self.value.length) {
-            return true;
+            return true
           }
 
-          var lastItem = self.value[self.value.length - 1];
-          self.remove(lastItem);
-          return false;
+          var lastItem = self.value[self.value.length - 1]
+          self.remove(lastItem)
+          return false
         }
         /*ESC*/
         if (keyCode == '27') {
-          self.$dropdown.html('').hide();
-          return false;
+          self.$dropdown.html('').hide()
+          return false
         }
         // UP DOWN ARROW KEY
         if (keyCode == '38' || keyCode == '40') {
 
-          $items = self.$dropdown.find('[data-text]');
+          $items = self.$dropdown.find('[data-text]')
 
           if (!$items.length) {
-            return false;
+            return false
           }
 
-
-          $hover = $items.filter('.ac-hover');
+          $hover = $items.filter('.ac-hover')
 
           if (!$hover.length) {
-            $items.removeClass('ac-hover');
-            $items.eq(keyCode == '40' ? 0 : -1).addClass('ac-hover');
+            $items.removeClass('ac-hover')
+            $items.eq(keyCode == '40' ? 0 : -1).addClass('ac-hover')
           } else {
-            var index = $hover.index();
-            $items.removeClass('ac-hover');
-            $items.eq(keyCode == '40' ? (index + 1) % $items.length : index - 1).addClass('ac-hover');
+            var index = $hover.index()
+            $items.removeClass('ac-hover')
+            $items.eq(keyCode == '40' ? (index + 1) % $items.length : index - 1).addClass('ac-hover')
           }
 
-          return false;
+          return false
         }
         // ENTER KEY CODE
         if (keyCode == '13') {
-          $items = self.$dropdown.find('[data-text]');
+          $items = self.$dropdown.find('[data-text]')
 
           /* add manual input */
           if (self.$el.val() && self.options.manualInput) {
@@ -303,196 +301,226 @@
             return true
           }
 
-
-
           if (!$items.length) {
-            return false;
+            return false
           }
 
-          $hover = $items.filter('.ac-hover');
+          $hover = $items.filter('.ac-hover')
 
           if (!$hover.length) {
-            return false;
+            return false
           }
 
           self.setValue({
             text: $hover.data('text')
-          });
+          })
 
-          return false;
+          return false
         }
 
-      });
+      })
 
       self.$dropdown.on('click', '[data-text]', function (e) {
-        var $t = $(this);
+        var $t = $(this)
         var item = {
           text: $t.data('text')
-        };
+        }
 
-        self.setValue(item);
-      });
+        self.setValue(item)
+      })
 
       self.$appender.on('click', '[data-text] .close', function (e) {
-        var $t = $(this);
-        var $li = $t.closest('[data-text]');
+        var $t = $(this)
+        var $li = $t.closest('[data-text]')
         var item = {
           text: $li.data('text')
-        };
+        }
 
-        self.remove(item);
-      });
+        self.remove(item)
+      })
 
     },
     render: function () {
-      var self = this;
+      var self = this
 
       if (self.options.dropdown.el) {
-        self.$dropdown = $(self.options.dropdown.el);
+        self.$dropdown = $(self.options.dropdown.el)
       } else {
-        self.$dropdown = $(document.createElement(self.options.dropdown.tagName));
-        self.$dropdown.insertAfter(self.$el);
+        self.$dropdown = $(document.createElement(self.options.dropdown.tagName))
+        self.$dropdown.insertAfter(self.$el)
       }
 
-      self.$dropdown.addClass(self.options.dropdown.className);
+      self.$dropdown.addClass(self.options.dropdown.className)
 
       if (self.options.appender.el) {
-        self.$appender = $(self.options.appender.el);
+        self.$appender = $(self.options.appender.el)
       } else {
-        self.$appender = $(document.createElement(self.options.appender.tagName));
-        self.$appender.insertBefore(self.$el);
+        self.$appender = $(document.createElement(self.options.appender.tagName))
+        self.$appender.insertBefore(self.$el)
       }
 
       if (self.options.hidden.enable) {
 
         if (self.options.hidden.el) {
-          self.$hidden = $(self.options.hidden.el);
+          self.$hidden = $(self.options.hidden.el)
         } else {
-          self.$hidden = $('<input type="hidden" class="validate" />');
-          self.$wrapper.append(self.$hidden);
+          self.$hidden = $('<input type="hidden" class="validate" />')
+          self.$wrapper.append(self.$hidden)
         }
 
         if (self.options.hidden.inputName) {
-          self.$hidden.attr('name', self.options.hidden.inputName);
+          self.$hidden.attr('name', self.options.hidden.inputName)
         }
 
         if (self.options.hidden.required) {
-          self.$hidden.attr('required', 'required');
+          self.$hidden.attr('required', 'required')
         }
 
       }
 
-      self.$appender.addClass(self.options.appender.className);
+      self.$appender.addClass(self.options.appender.className)
 
     },
     setValue: function (item) {
-      var self = this;
+      var self = this
 
       if (self.options.multiple.enable) {
-        self.append(item);
+        if (self.list.indexOf(item.text) < 0)
+          self.list.push(item.text)
+        self.append(item)
       } else {
-        self.select(item);
+        if (self.list.indexOf(item.text) < 0)
+          self.list.push(item.text)
+        self.select(item)
       }
 
     },
     append: function (item) {
-      var self = this;
-      var $tag = self.compiled.tag({ 'item': item });
+      var self = this
+      var $tag = self.compiled.tag({'item': item})
 
       if (self.value.some(function (selectedItem) {
-          return selectedItem.text === item.text;
+          return selectedItem.text === item.text
         })) {
 
         if ('function' === typeof self.options.multiple.onExist) {
-          self.options.multiple.onExist.call(this, item);
+          self.options.multiple.onExist.call(this, item)
         }
 
-        return false;
+        return false
       }
 
       if (self.value.length >= self.options.multiple.maxSize) {
 
         if ('function' === typeof self.options.multiple.onExceed) {
-          self.options.multiple.onExceed.call(this, self.options.multiple.maxSize, item);
+          self.options.multiple.onExceed.call(this, self.options.multiple.maxSize, item)
         }
 
-        return false;
+        return false
       }
 
-      self.value.push(item);
-      self.$appender.append($tag);
+      self.value.push(item)
+      self.$appender.append($tag)
 
       var valueStr = self.value.map(function (selectedItem) {
-        return selectedItem.text;
-      }).join(',');
+        return selectedItem.text
+      }).join(',')
 
       if (self.options.hidden.enable) {
-        self.$hidden.val(valueStr);
+        self.$hidden.val(valueStr)
       }
 
-      self.$el.val('');
-      self.$el.data('value', valueStr);
-      self.$dropdown.html('').hide();
+      self.$el.val('')
+      self.$el.data('value', valueStr)
+      self.$dropdown.html('').hide()
 
       if ('function' === typeof self.options.multiple.onAppend) {
-        self.options.multiple.onAppend.call(self, item);
+        self.options.multiple.onAppend.call(self, item)
       }
 
     },
     remove: function (item) {
-      var self = this;
-      self.$appender.find('[data-text="' + item.text + '"]').remove();
+      var self = this
+      let index = self.list.indexOf(item.text)
+      self.list.splice(1, index)
+      self.$appender.find('[data-text="' + item.text + '"]').remove()
       self.value = self.value.filter(function (selectedItem) {
-        return selectedItem.text !== item.text;
-      });
+        return selectedItem.text !== item.text
+      })
 
       var valueStr = self.value.map(function (selectedItem) {
-        return selectedItem.text;
-      }).join(',');
+        return selectedItem.text
+      }).join(',')
 
       if (self.options.hidden.enable) {
-        self.$hidden.val(valueStr);
-        self.$el.data('value', valueStr);
+        self.$hidden.val(valueStr)
+        self.$el.data('value', valueStr)
       }
 
-      self.$dropdown.html('').hide();
+      self.$dropdown.html('').hide()
 
       if ('function' === typeof self.options.multiple.onRemove) {
-        self.options.multiple.onRemove.call(self, item);
+        self.options.multiple.onRemove.call(self, item)
       }
 
     },
-    select: function (item) {
-      var self = this;
+    removeAll: function () {
+      var self = this
+      self.list.forEach(function (item, idx) {
 
-      self.value = item.text;
-      self.$el.val(item.text);
-      self.$el.data('value', item.text);
-      self.$dropdown.html('').hide();
+        self.$appender.find('[data-text="' + item + '"]').remove()
+        self.value = self.value.filter(function (selectedItem) {
+          return selectedItem.text !== item
+        })
+
+        var valueStr = self.value.map(function (selectedItem) {
+          return selectedItem.text
+        }).join(',')
+
+        if (self.options.hidden.enable) {
+          self.$hidden.val(valueStr)
+          self.$el.data('value', valueStr)
+        }
+
+        self.$dropdown.html('').hide()
+
+        if ('function' === typeof self.options.multiple.onRemove) {
+          self.options.multiple.onRemove.call(self, {text: item})
+        }
+      })
+    },
+
+    select: function (item) {
+      var self = this
+
+      self.value = item.text
+      self.$el.val(item.text)
+      self.$el.data('value', item.text)
+      self.$dropdown.html('').hide()
 
       if (self.options.hidden.enable) {
-        self.$hidden.val(item.text);
+        self.$hidden.val(item.text)
       }
 
       if ('function' === typeof self.options.onSelect) {
-        self.options.onSelect.call(self, item);
+        self.options.onSelect.call(self, item)
       }
     }
-  };
+  }
 
   $.fn.materialize_autocomplete = function (options) {
-    var el = this;
-    var $el = $(el).eq(0);
-    var instance = $el.data('autocomplete');
+    var el = this
+    var $el = $(el).eq(0)
+    var instance = $el.data('autocomplete')
 
     if (instance && arguments.length) {
-      return instance;
+      return instance
     }
 
-    var autocomplete = new Autocomplete(el, options);
-    $el.data('autocomplete', autocomplete);
-    $el.dropdown();
-    return autocomplete;
-  };
+    var autocomplete = new Autocomplete(el, options)
+    $el.data('autocomplete', autocomplete)
+    $el.dropdown()
+    return autocomplete
+  }
 
-}));
+}))
