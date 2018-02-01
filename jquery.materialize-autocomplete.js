@@ -291,14 +291,21 @@
         if (keyCode == '13') {
           $items = self.$dropdown.find('[data-text]')
 
+          $length = $items.length;
           /* add manual input */
           if (self.$el.val() && self.options.manualInput) {
 
-            self.setValue({
-              text: self.$el.val()
-            })
+            if($length ){
+              $hover = $items.filter('.ac-hover')
+            }
 
-            return true
+            if(!$hover.length) {
+              self.setValue({
+                text: self.$el.val()
+              })
+
+              return true
+            }
           }
 
           if (!$items.length) {
