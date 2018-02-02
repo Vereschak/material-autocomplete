@@ -210,7 +210,8 @@
           return false
         }
 
-        if (self.options.manualInput) {
+        if (self.options.manualInput && self.options.multiple.enable === false) {
+
           self.setValue({
             text: value
           })
@@ -294,6 +295,15 @@
           $length = $items.length;
           /* add manual input */
           if (self.$el.val() && self.options.manualInput) {
+
+
+            if(self.options.multiple.enable){
+              self.setValue({
+                text: self.$el.val()
+              })
+              return true
+            }
+
 
             if($length ){
               $hover = $items.filter('.ac-hover')
@@ -442,6 +452,7 @@
       self.$dropdown.html('').hide()
 
       if ('function' === typeof self.options.multiple.onAppend) {
+
         self.options.multiple.onAppend.call(self, item)
       }
 
