@@ -296,12 +296,18 @@
           /* add manual input */
           if (self.$el.val() && self.options.manualInput) {
 
-
             if(self.options.multiple.enable){
-              self.setValue({
-                text: self.$el.val()
-              })
-              return true
+
+              if($length ){
+                $hover = $items.filter('.ac-hover')
+              }
+
+              if((typeof($hover)!=='undefined' && !$hover.length) ||!$length) {
+                self.setValue({
+                  text: self.$el.val()
+                })
+                return true
+              }
             }
 
 
