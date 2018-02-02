@@ -299,7 +299,7 @@
               $hover = $items.filter('.ac-hover')
             }
 
-            if(!$hover.length) {
+            if(typeof($hover)!=='undefined' && !$hover.length) {
               self.setValue({
                 text: self.$el.val()
               })
