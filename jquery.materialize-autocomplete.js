@@ -423,8 +423,8 @@
       var $tag = self.compiled.tag({'item': item})
 
       if (self.value.some(function (selectedItem) {
-          return selectedItem.text === item.text
-        })) {
+        return selectedItem.text === item.text
+      })) {
 
         if ('function' === typeof self.options.multiple.onExist) {
           self.options.multiple.onExist.call(this, item)
@@ -467,7 +467,11 @@
       var self = this
       let index = self.list.indexOf(item.text)
       self.list.splice(1, index)
-      self.$appender.find('[data-text="' + item.text + '"]').remove()
+      self.$appender.find('*').filter((el, i)=>{
+       if( i.getAttribute('data-text')==item.text){
+         i.remove()
+        }
+      })
       self.value = self.value.filter(function (selectedItem) {
         return selectedItem.text !== item.text
       })
@@ -492,7 +496,9 @@
       var self = this
       self.list.forEach(function (item, idx) {
 
-        self.$appender.find('[data-text="' + item + '"]').remove()
+        self.$appender.find('*').filter((el, i)=>{
+          i.remove()
+        })
         self.value = self.value.filter(function (selectedItem) {
           return selectedItem.text !== item
         })
