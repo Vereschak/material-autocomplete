@@ -1,6 +1,6 @@
 {
   "name": "@danil.vereschak/material-autocomplete",
-  "version": "1.0.12",
+  "version": "1.0.13",
   "description": "Materialize-css styled autocomplete, examples:  [https://icefox0801.github.io/materialize-autocomplete/examples/](https://icefox0801.github.io/materialize-autocomplete/examples/)",
   "main": "jquery.materialize-autocomplete.js",
   "directories": {
