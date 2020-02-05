@@ -49,8 +49,8 @@
     source += '\';\n'
     source = 'with(obj||{}){\n' + source + '}\n'
     source = 'var __t,__p=\'\',__j=Array.prototype.join,' +
-      'print=function(){__p+=__j.call(arguments,\'\');};\n' +
-      source + 'return __p;\n'
+        'print=function(){__p+=__j.call(arguments,\'\');};\n' +
+        source + 'return __p;\n'
 
     var render
 
@@ -132,6 +132,7 @@
       callback(value, [])
     },
     onSelect: noop,
+    onClick: noop,
     ignoreCase: true,
     throttling: true,
     manualValue: ''
@@ -350,6 +351,7 @@
         }
 
         self.setValue(item)
+        self.click(item)
       })
 
       self.$appender.on('click', '[data-text] .close', function (e) {
@@ -417,6 +419,7 @@
         self.select(item)
       }
 
+
     },
     append: function (item) {
       var self = this
@@ -468,8 +471,8 @@
       let index = self.list.indexOf(item.text)
       self.list.splice(1, index)
       self.$appender.find('*').filter((el, i)=>{
-       if( i.getAttribute('data-text')==item.text){
-         i.remove()
+        if( i.getAttribute('data-text')==item.text){
+          i.remove()
         }
       })
       self.value = self.value.filter(function (selectedItem) {
@@ -534,6 +537,22 @@
 
       if ('function' === typeof self.options.onSelect) {
         self.options.onSelect.call(self, item)
+      }
+    },
+    click: function (item) {
+      var self = this
+
+      self.value = item.text
+      self.$el.val(item.text)
+      self.$el.data('value', item.text)
+      self.$dropdown.html('').hide()
+
+      if (self.options.hidden.enable) {
+        self.$hidden.val(item.text)
+      }
+
+      if ('function' === typeof self.options.onClick) {
+        self.options.onClick.call(self, item)
       }
     }
   }
