@@ -536,14 +536,6 @@
     click: function (item) {
       var self = this
 
-      self.value = item.text
-      self.$el.val(item.text)
-      self.$el.data('value', item.text)
-      self.$dropdown.html('').hide()
-
-      if (self.options.hidden.enable) {
-        self.$hidden.val(item.text)
-      }
 
       if ('function' === typeof self.options.onClick) {
         self.options.onClick.call(self, item)
