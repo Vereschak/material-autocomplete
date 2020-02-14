@@ -495,9 +495,7 @@
       var self = this
       self.list.forEach(function (item, idx) {
 
-        self.$appender.find('*').filter((el, i)=>{
-          i.remove()
-        })
+        self.$appender.find('[data-text="' + item + '"]').remove()
         self.value = self.value.filter(function (selectedItem) {
           return selectedItem.text !== item
         })
