@@ -119,13 +119,13 @@
       el: '',
       tagName: 'ul',
       className: 'ac-appender',
-      tagTemplate: '<div class="chip"  data-text="<%= item.text %>"><%= item.text %><i data-close="<%= item.text %>" class="material-icons close">close</i></div>'
+      tagTemplate: '<div class="chip" data-id="<%= item.id %>"  data-text="<%= item.text %>"><%= item.text %><i data-close="<%= item.text %>" class="material-icons close">close</i></div>'
     },
     dropdown: {
       el: '',
       tagName: 'ul',
       className: 'ac-dropdown',
-      itemTemplate: '<li class="ac-item" data-text="<%= item.text %>"><a href="javascript:void(0)"><%= item.text %></a></li>',
+      itemTemplate: '<li class="ac-item" data-id="<%= item.id %>" data-text="<%= item.text %>"><a href="javascript:void(0)"><%= item.text %></a></li>',
       noItem: ''
     },
     getData: function (value, callback) {
@@ -202,7 +202,8 @@
 
         if (!value && self.options.multiple.enable === false) {
           self.setValue({
-            text: value
+            text: value,
+            id: value.hashCode()
           })
         }
 
@@ -214,7 +215,8 @@
         if (self.options.manualInput && self.options.multiple.enable === false) {
 
           self.setValue({
-            text: value
+            text: value,
+            id: value.hashCode()
           })
         }
 
@@ -270,7 +272,7 @@
         // UP DOWN ARROW KEY
         if (keyCode == '38' || keyCode == '40') {
 
-          $items = self.$dropdown.find('[data-text]')
+          $items = self.$dropdown.find('[data-id]')
 
           if (!$items.length) {
             return false
@@ -291,7 +293,7 @@
         }
         // ENTER KEY CODE
         if (keyCode == '13') {
-          $items = self.$dropdown.find('[data-text]')
+          $items = self.$dropdown.find('[data-id]')
 
           $length = $items.length;
           /* add manual input */
@@ -305,7 +307,8 @@
 
               if((typeof($hover)!=='undefined' && !$hover.length) ||!$length) {
                 self.setValue({
-                  text: self.$el.val()
+                  text: self.$el.val(),
+                  id: self.$el.val().hashCode()
                 })
                 return true
               }
@@ -318,7 +321,8 @@
 
             if(typeof($hover)!=='undefined' && !$hover.length) {
               self.setValue({
-                text: self.$el.val()
+                text: self.$el.val(),
+                id: self.$el.val().hashCode()
               })
 
               return true
@@ -336,7 +340,8 @@
           }
 
           self.setValue({
-            text: $hover.data('text')
+            text: $hover.data('text'),
+            id: $hover.data('text').hashCode()
           })
 
           return false
@@ -344,9 +349,10 @@
 
       })
 
-      self.$dropdown.on('click', '[data-text]', function (e) {
+      self.$dropdown.on('click', '[data-id]', function (e) {
         var $t = $(this)
         var item = {
+          id: $t.data('text').hashCode(),
           text: $t.data('text')
         }
 
@@ -354,10 +360,11 @@
         self.click(item)
       })
 
-      self.$appender.on('click', '[data-text] .close', function (e) {
+      self.$appender.on('click', '[data-id] .close', function (e) {
         var $t = $(this)
-        var $li = $t.closest('[data-text]')
+        var $li = $t.closest('[data-id]')
         var item = {
+          id: $li.data('text').hashCode(),
           text: $li.data('text')
         }
 
@@ -408,14 +415,17 @@
     },
     setValue: function (item) {
       var self = this
+      if(typeof item.id =='undefined'){
+        item.id = item.text.hashCode()
+      }
 
       if (self.options.multiple.enable) {
-        if (self.list.indexOf(item.text) < 0)
-          self.list.push(item.text)
+        if (self.list.indexOf(item) < 0)
+          self.list.push(item)
         self.append(item)
       } else {
-        if (self.list.indexOf(item.text) < 0)
-          self.list.push(item.text)
+        if (self.list.indexOf(item) < 0)
+          self.list.push(item)
         self.select(item)
       }
 
@@ -426,7 +436,7 @@
       var $tag = self.compiled.tag({'item': item})
 
       if (self.value.some(function (selectedItem) {
-        return selectedItem.text === item.text
+        return selectedItem.id === item.id
       })) {
 
         if ('function' === typeof self.options.multiple.onExist) {
@@ -449,7 +459,7 @@
       self.$appender.append($tag)
 
       var valueStr = self.value.map(function (selectedItem) {
-        return selectedItem.text
+        return selectedItem.id
       }).join(',')
 
       if (self.options.hidden.enable) {
@@ -468,15 +478,15 @@
     },
     remove: function (item) {
       var self = this
-      let index = self.list.indexOf(item.text)
+      let index = self.list.indexOf(item)
       self.list.splice(1, index)
-      self.$appender.find('[data-text="' + item.text + '"]').remove()
+      self.$appender.find('[data-id="' + item.id + '"]').remove()
       self.value = self.value.filter(function (selectedItem) {
-        return selectedItem.text !== item.text
+        return selectedItem.id !== item.id
       })
 
       var valueStr = self.value.map(function (selectedItem) {
-        return selectedItem.text
+        return selectedItem.id
       }).join(',')
 
       if (self.options.hidden.enable) {
@@ -495,13 +505,13 @@
       var self = this
       self.list.forEach(function (item, idx) {
 
-        self.$appender.find('[data-text="' + item + '"]').remove()
+        self.$appender.find('[data-id="' + item.id + '"]').remove()
         self.value = self.value.filter(function (selectedItem) {
-          return selectedItem.text !== item
+          return selectedItem.id !== item.id
         })
 
         var valueStr = self.value.map(function (selectedItem) {
-          return selectedItem.text
+          return selectedItem.id
         }).join(',')
 
         if (self.options.hidden.enable) {
@@ -512,7 +522,7 @@
         self.$dropdown.html('').hide()
 
         if ('function' === typeof self.options.multiple.onRemove) {
-          self.options.multiple.onRemove.call(self, {text: item})
+          self.options.multiple.onRemove.call(self, {text: item.text, id:item.id})
         }
       })
     },
@@ -522,11 +532,11 @@
 
       self.value = item.text
       self.$el.val(item.text)
-      self.$el.data('value', item.text)
+      self.$el.data('value', item.id)
       self.$dropdown.html('').hide()
 
       if (self.options.hidden.enable) {
-        self.$hidden.val(item.text)
+        self.$hidden.val(item.id)
       }
 
       if ('function' === typeof self.options.onSelect) {
@@ -557,5 +567,16 @@
     $el.dropdown()
     return autocomplete
   }
+
+  String.prototype.hashCode = function() {
+    var hash = 0, i, chr;
+    if (this.length === 0) return hash;
+    for (i = 0; i < this.length; i++) {
+      chr   = this.charCodeAt(i);
+      hash  = ((hash << 5) - hash) + chr;
+      hash |= 0; // Convert to 32bit integer
+    }
+    return hash;
+  };
 
 }))
