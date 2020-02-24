@@ -164,6 +164,8 @@
         return itemsHtml
       }
 
+
+
       function handleList (value, list) {
         var itemsHtml = getItemsHtml(list)
         var currentValue = self.$el.val()
@@ -203,7 +205,7 @@
         if (!value && self.options.multiple.enable === false) {
           self.setValue({
             text: value,
-            id: value.hashCode()
+            id: hashCodeAutocomplete(value)
           })
         }
 
@@ -216,7 +218,7 @@
 
           self.setValue({
             text: value,
-            id: value.hashCode()
+            id: hashCodeAutocomplete(value)
           })
         }
 
@@ -308,7 +310,7 @@
               if((typeof($hover)!=='undefined' && !$hover.length) ||!$length) {
                 self.setValue({
                   text: self.$el.val(),
-                  id: self.$el.val().hashCode()
+                  id: hashCodeAutocomplete(self.$el.val())
                 })
                 return true
               }
@@ -322,7 +324,7 @@
             if(typeof($hover)!=='undefined' && !$hover.length) {
               self.setValue({
                 text: self.$el.val(),
-                id: self.$el.val().hashCode()
+                id: hashCodeAutocomplete(self.$el.val())
               })
 
               return true
@@ -341,7 +343,7 @@
 
           self.setValue({
             text: $hover.data('text'),
-            id: $hover.data('text').hashCode()
+            id: hashCodeAutocomplete($hover.data('text'))
           })
 
           return false
@@ -352,7 +354,7 @@
       self.$dropdown.on('click', '[data-id]', function (e) {
         var $t = $(this)
         var item = {
-          id: $t.data('text').hashCode(),
+          id: hashCodeAutocomplete($t.data('text')),
           text: $t.data('text')
         }
 
@@ -364,7 +366,7 @@
         var $t = $(this)
         var $li = $t.closest('[data-id]')
         var item = {
-          id: $li.data('text').hashCode(),
+          id: hashCodeAutocomplete($li.data('text')),
           text: $li.data('text')
         }
 
@@ -416,7 +418,7 @@
     setValue: function (item) {
       var self = this
       if(typeof item.id =='undefined'){
-        item.id = item.text.hashCode()
+        item.id = hashCodeAutocomplete(item.text)
       }
 
       if (self.options.multiple.enable) {
@@ -568,15 +570,17 @@
     return autocomplete
   }
 
-  String.prototype.hashCode = function() {
+  function hashCodeAutocomplete (value) {
     var hash = 0, i, chr;
-    if (this.length === 0) return hash;
-    for (i = 0; i < this.length; i++) {
-      chr   = this.charCodeAt(i);
+    if (value.length === 0) return hash;
+    for (i = 0; i < value.length; i++) {
+      chr   = value.charCodeAt(i);
       hash  = ((hash << 5) - hash) + chr;
-      hash |= 0; // Convert to 32bit integer
+      hash |= 0;
     }
     return hash;
-  };
+
+  }
+
 
 }))
