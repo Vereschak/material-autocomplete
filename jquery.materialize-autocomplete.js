@@ -93,10 +93,10 @@
       enable: false,
       maxSize: 4,
       onExist: function (item) {
-        Materialize.toast('Tag: ' + item.text + ' is already added!', 2000)
+       // Materialize.toast('Tag: ' + item.text + ' is already added!', 2000)
       },
       onExceed: function (maxSize, item) {
-        Materialize.toast('Can\'t add over ' + maxSize + ' tags!', 2000)
+       // Materialize.toast('Can\'t add over ' + maxSize + ' tags!', 2000)
       },
       onAppend: function (item) {
         var self = this
